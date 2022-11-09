@@ -1,3 +1,4 @@
-declare module "plugin-setsuna" {
-  export type setsunaPlugin = () => void
-}
+import { PluginOption } from "vite"
+
+
+export const setsunaPlugin = () => PluginOption
