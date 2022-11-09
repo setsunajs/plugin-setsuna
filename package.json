@@ -27,7 +27,8 @@
     "format": "prettier -w ."
   },
   "dependencies": {
-    "@babel/core": "^7.20.2"
+    "@babel/core": "^7.20.2",
+    "@babel/plugin-transform-typescript": "^7.20.2"
   },
   "devDependencies": {
     "@babel/plugin-transform-react-jsx": "^7.19.0",

@@ -20,7 +20,7 @@ export function setsunaPlugin() {
       }
     },
 
-    transform(source, id) {
+    async transform(source, id) {
       if (!regJsx.test(id)) return
 
       let hasRender = false
@@ -40,6 +40,13 @@ export function setsunaPlugin() {
               pragma: "jsx",
               pragmaFrag: "Fragment",
               useBuiltIns: true
+            }
+          ],
+          id.endsWith("tsx") && [
+            require("@babel/plugin-transform-typescript"),
+            {
+              isTSX: true,
+              allExtensions: true
             }
           ],
           {
