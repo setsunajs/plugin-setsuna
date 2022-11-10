@@ -5,14 +5,17 @@ export function injectHMRInfo({ id, body }) {
   const hash = createHash(id)
   const componentNames = new Set()
   const hmrComponent = []
-  body.forEach(node => {
+  body.forEach((node, index) => {
     let useNode = node
     const isExport = isExportDeclaration(node)
 
-    if (isExport && node.specifiers?.length > 0) {
+    if (isExport && node.specifiers && node.specifiers.length > 0) {
       return node.specifiers.forEach(item => {
         const name = item.exported.name
-        componentNames.has(name) && hmrComponent.push(name)
+        if (componentNames.has(name)) {
+          hmrComponent.push(name)
+          body.splice(index + 1, 0, ...resolveHMRNode(name, hash, id))
+        }
       })
     }
 
@@ -28,48 +31,19 @@ export function injectHMRInfo({ id, body }) {
     const res = isAllowFunctionType(useNode, false)
     if (res) {
       if (!node.id) {
-        return hmrComponent.push("__default__")
+        hmrComponent.push("__default__")
+        body.splice(index + 1, 0, ...resolveHMRNode(name, hash, id))
+        return
       }
       const name = node.id.name
       componentNames.add(name)
 
       if (isExport) {
         hmrComponent.push(name)
+        body.splice(index + 1, 0, ...resolveHMRNode(name, hash, id))
       }
     }
   })
-
-  body.unshift(
-    ...hmrComponent
-      .map(name => {
-        return [
-          types.expressionStatement(
-            types.assignmentExpression(
-              "=",
-              types.memberExpression(
-                types.Identifier(name),
-                types.Identifier("hmrId"),
-                false
-              ),
-              types.stringLiteral(hash)
-            )
-          ),
-          types.expressionStatement(
-            types.assignmentExpression(
-              "=",
-              types.memberExpression(
-                types.Identifier(name),
-                types.Identifier("file"),
-                false
-              ),
-              types.stringLiteral(id)
-            )
-          )
-        ]
-      })
-      .flat()
-  )
-
   return hmrComponent
 }
 
@@ -120,4 +94,31 @@ function isAllowFunctionType(node, done) {
   ].includes(node.type)
     ? isAllowFunction(node, done)
     : false
+}
+
+function resolveHMRNode(name, hash, id) {
+  return [
+    types.expressionStatement(
+      types.assignmentExpression(
+        "=",
+        types.memberExpression(
+          types.Identifier(name),
+          types.Identifier("hmrId"),
+          false
+        ),
+        types.stringLiteral(hash)
+      )
+    ),
+    types.expressionStatement(
+      types.assignmentExpression(
+        "=",
+        types.memberExpression(
+          types.Identifier(name),
+          types.Identifier("file"),
+          false
+        ),
+        types.stringLiteral(id)
+      )
+    )
+  ]
 }
