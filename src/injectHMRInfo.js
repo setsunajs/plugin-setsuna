@@ -5,7 +5,9 @@ export function injectHMRInfo({ id, body }) {
   const hash = createHash(id)
   const componentNames = new Set()
   const hmrComponent = []
-  body.forEach((node, index) => {
+
+  for (let index = 0; index < body.length; index++) {
+    let node = body[index]
     let useNode = node
     const isExport = isExportDeclaration(node)
 
@@ -43,7 +45,7 @@ export function injectHMRInfo({ id, body }) {
         body.splice(index + 1, 0, ...resolveHMRNode(name, hash, id))
       }
     }
-  })
+  }
   return hmrComponent
 }
 
