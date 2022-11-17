@@ -57,7 +57,7 @@ export function setsunaPlugin() {
               },
               ImportSpecifier(path) {
                 if (
-                  path.parentPath.node.source.value === "@setsunajs/setsuna" &&
+                  path.parentPath.node.source.value === "setsunajs" &&
                   path.node.imported.name === "render" &&
                   path.scope.getBinding("render").referencePaths.length > 0
                 ) {
@@ -65,7 +65,7 @@ export function setsunaPlugin() {
                 }
 
                 if (
-                  path.parentPath.node.source.value === "@setsunajs/setsuna" &&
+                  path.parentPath.node.source.value === "setsunajs" &&
                   path.node.imported.name === "defineElement" &&
                   path.scope.getBinding("defineElement").referencePaths.length >
                     0
