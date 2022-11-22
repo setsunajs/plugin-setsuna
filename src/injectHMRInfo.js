@@ -2,7 +2,6 @@ import { types } from "@babel/core"
 import { createHash } from "./createHash"
 
 export function injectHMRInfo({ id, body }) {
-  const hash = createHash(id)
   const componentNames = new Set()
   const hmrComponent = []
 
@@ -16,7 +15,7 @@ export function injectHMRInfo({ id, body }) {
         const name = item.exported.name
         if (componentNames.has(name)) {
           hmrComponent.push(name)
-          body.splice(index + 1, 0, ...resolveHMRNode(name, hash, id))
+          body.splice(index + 1, 0, ...resolveHMRNode(name, createHash(id + name), id))
         }
       })
     }
@@ -34,7 +33,7 @@ export function injectHMRInfo({ id, body }) {
     if (res) {
       if (!node.id) {
         hmrComponent.push("__default__")
-        body.splice(index + 1, 0, ...resolveHMRNode(name, hash, id))
+        body.splice(index + 1, 0, ...resolveHMRNode(name, createHash(id + name), id))
         return
       }
       const name = node.id.name
@@ -42,7 +41,7 @@ export function injectHMRInfo({ id, body }) {
 
       if (isExport) {
         hmrComponent.push(name)
-        body.splice(index + 1, 0, ...resolveHMRNode(name, hash, id))
+        body.splice(index + 1, 0, ...resolveHMRNode(name, createHash(id + name), id))
       }
     }
   }
